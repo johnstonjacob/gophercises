@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -36,6 +37,7 @@ func getQuestions(shuffle bool) [][]string {
 }
 
 func shuffleQuestions(qa [][]string) [][]string {
+	rand.Seed(time.Now().UTC().UnixNano())
 	fmt.Println("Shuffling questions..")
 	rand.Shuffle(len(qa), func(i, j int) {
 		qa[i], qa[j] = qa[j], qa[i]
@@ -52,7 +54,7 @@ func getInput() string {
 	return input
 }
 
-func normalizeString(a string, i string) bool {
+func compareString(a string, i string) bool {
 	a = strings.Trim(a, " ")
 	a = strings.ToLower(a)
 
@@ -72,7 +74,7 @@ func gameLoop(qa [][]string) {
 
 		input := getInput()
 
-		if normalizeString(a, input) {
+		if compareString(a, input) {
 			score++
 			fmt.Println("Correct!")
 		} else {
