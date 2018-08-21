@@ -2,25 +2,44 @@ package main
 
 import (
 	"encoding/csv"
-	"strings"
-	//	"flag"
+	"flag"
 	"fmt"
+	"math/rand"
 	"os"
+	"strings"
 )
 
 func main() {
+	var shuffle bool
+	flag.BoolVar(&shuffle, "s", false, "Shuffle the questions. Default: false")
+
+	flag.Parse()
+
 	fmt.Println("Starting quiz...")
-	qa := getQuestions()
+	qa := getQuestions(shuffle)
 
 	gameLoop(qa)
 }
 
-func getQuestions() [][]string {
+func getQuestions(shuffle bool) [][]string {
 	path := "/Users/jacobjohnston/Go/src/github.com/johnstonjacob/gophercises/ex/quiz_game/problems.csv"
 	osReader, _ := os.Open(path)
 	csvReader := csv.NewReader(osReader)
 
 	qa, _ := csvReader.ReadAll()
+
+	if shuffle {
+		return shuffleQuestions(qa)
+	}
+
+	return qa
+}
+
+func shuffleQuestions(qa [][]string) [][]string {
+	fmt.Println("Shuffling questions..")
+	rand.Shuffle(len(qa), func(i, j int) {
+		qa[i], qa[j] = qa[j], qa[i]
+	})
 
 	return qa
 }
