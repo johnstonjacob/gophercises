@@ -10,16 +10,37 @@ import (
 	"time"
 )
 
+type game struct {
+	score     int
+	questions int
+}
+
 func main() {
 	var shuffle bool
+	var timer int
+
+	game := game{0, 0}
+
 	flag.BoolVar(&shuffle, "s", false, "Shuffle the questions. Default: false")
+	flag.IntVar(&timer, "t", 90, "Sets time for timer in seconds. Default: 90")
 
 	flag.Parse()
 
 	fmt.Println("Starting quiz...")
 	qa := getQuestions(shuffle)
 
-	gameLoop(qa)
+	go quizTimer(timer, &game)
+	gameLoop(qa, &game)
+}
+
+func quizTimer(t int, g *game) {
+	d := time.Duration(t) * time.Second
+	time.AfterFunc(d, func() {
+		fmt.Println("\nTimes up!")
+		fmt.Printf("Final score: %d / %d\n", g.score, g.questions)
+		os.Exit(0)
+	})
+
 }
 
 func getQuestions(shuffle bool) [][]string {
@@ -38,7 +59,9 @@ func getQuestions(shuffle bool) [][]string {
 
 func shuffleQuestions(qa [][]string) [][]string {
 	rand.Seed(time.Now().UTC().UnixNano())
+
 	fmt.Println("Shuffling questions..")
+
 	rand.Shuffle(len(qa), func(i, j int) {
 		qa[i], qa[j] = qa[j], qa[i]
 	})
@@ -64,8 +87,8 @@ func compareString(a string, i string) bool {
 	return a == i
 }
 
-func gameLoop(qa [][]string) {
-	score := 0
+func gameLoop(qa [][]string, g *game) {
+	g.questions = len(qa)
 
 	for _, tuple := range qa {
 		q, a := tuple[0], tuple[1]
@@ -75,12 +98,12 @@ func gameLoop(qa [][]string) {
 		input := getInput()
 
 		if compareString(a, input) {
-			score++
+			g.score++
 			fmt.Println("Correct!")
 		} else {
 			fmt.Println("Incorrect..")
 		}
 	}
 
-	fmt.Printf("Final score: %d / %d\n", score, len(qa))
+	fmt.Printf("Final score: %d / %d\n", g.score, len(qa))
 }
