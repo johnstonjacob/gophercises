@@ -30,8 +30,8 @@ func main() {
 
 	go gameLoop(qa)
 
-	t := time.NewTimer(time.Duration(timer) * time.Second)
-	<-t.C
+	time.Sleep(time.Duration(timer) * time.Second)
+
 	fmt.Println("\nTimes up!")
 	endGame()
 }
@@ -92,7 +92,7 @@ func gameLoop(qa [][]string) {
 			score++
 			fmt.Println("Correct!")
 		} else {
-			fmt.Println("Incorrect..")
+			fmt.Println("Incorrect.")
 		}
 	}
 	endGame()
