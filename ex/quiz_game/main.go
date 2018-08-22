@@ -16,15 +16,17 @@ var numOfQ int
 func main() {
 	var shuffle bool
 	var timer int
+	var csvFile string
 	score = 0
 
 	flag.BoolVar(&shuffle, "s", false, "Shuffle the questions. Default: false")
 	flag.IntVar(&timer, "t", 90, "Sets time for timer in seconds. Default: 90")
+	flag.StringVar(&csvFile, "c", "problems.csv", "Sets CSV file name for questions. Default: problems.csv")
 
 	flag.Parse()
 
 	fmt.Println("Starting quiz...")
-	qa := getQuestions(shuffle)
+	qa := getQuestions(csvFile, shuffle)
 
 	numOfQ = len(qa)
 
@@ -36,12 +38,33 @@ func main() {
 	endGame()
 }
 
-func getQuestions(shuffle bool) [][]string {
-	path := "/Users/jacobjohnston/Go/src/github.com/johnstonjacob/gophercises/ex/quiz_game/problems.csv"
-	osReader, _ := os.Open(path)
-	csvReader := csv.NewReader(osReader)
+func gameLoop(qa [][]string) {
+	for _, tuple := range qa {
+		q, a := tuple[0], tuple[1]
 
-	qa, _ := csvReader.ReadAll()
+		fmt.Println(q)
+
+		input := getInput()
+
+		if compareString(a, input) {
+			score++
+			fmt.Println("Correct!")
+		} else {
+			fmt.Println("Incorrect.")
+		}
+	}
+	endGame()
+}
+
+func getQuestions(path string, shuffle bool) [][]string {
+	osReader, _ := os.Open(path)
+
+	csvReader := csv.NewReader(osReader)
+	qa, err := csvReader.ReadAll()
+
+	if err != nil {
+		fmt.Printf("Something went wrong with opening this file: %s", path)
+	}
 
 	if shuffle {
 		return shuffleQuestions(qa)
@@ -78,24 +101,6 @@ func compareString(a string, i string) bool {
 	i = strings.ToLower(i)
 
 	return a == i
-}
-
-func gameLoop(qa [][]string) {
-	for _, tuple := range qa {
-		q, a := tuple[0], tuple[1]
-
-		fmt.Println(q)
-
-		input := getInput()
-
-		if compareString(a, input) {
-			score++
-			fmt.Println("Correct!")
-		} else {
-			fmt.Println("Incorrect.")
-		}
-	}
-	endGame()
 }
 
 func endGame() {
