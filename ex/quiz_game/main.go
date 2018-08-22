@@ -10,16 +10,13 @@ import (
 	"time"
 )
 
-type game struct {
-	score     int
-	questions int
-}
+var score int
+var numOfQ int
 
 func main() {
 	var shuffle bool
 	var timer int
-
-	game := game{0, 0}
+	score = 0
 
 	flag.BoolVar(&shuffle, "s", false, "Shuffle the questions. Default: false")
 	flag.IntVar(&timer, "t", 90, "Sets time for timer in seconds. Default: 90")
@@ -29,18 +26,14 @@ func main() {
 	fmt.Println("Starting quiz...")
 	qa := getQuestions(shuffle)
 
-	go quizTimer(timer, &game)
-	gameLoop(qa, &game)
-}
+	numOfQ = len(qa)
 
-func quizTimer(t int, g *game) {
-	d := time.Duration(t) * time.Second
-	time.AfterFunc(d, func() {
-		fmt.Println("\nTimes up!")
-		fmt.Printf("Final score: %d / %d\n", g.score, g.questions)
-		os.Exit(0)
-	})
+	go gameLoop(qa)
 
+	t := time.NewTimer(time.Duration(timer) * time.Second)
+	<-t.C
+	fmt.Println("\nTimes up!")
+	endGame()
 }
 
 func getQuestions(shuffle bool) [][]string {
@@ -87,9 +80,7 @@ func compareString(a string, i string) bool {
 	return a == i
 }
 
-func gameLoop(qa [][]string, g *game) {
-	g.questions = len(qa)
-
+func gameLoop(qa [][]string) {
 	for _, tuple := range qa {
 		q, a := tuple[0], tuple[1]
 
@@ -98,12 +89,16 @@ func gameLoop(qa [][]string, g *game) {
 		input := getInput()
 
 		if compareString(a, input) {
-			g.score++
+			score++
 			fmt.Println("Correct!")
 		} else {
 			fmt.Println("Incorrect..")
 		}
 	}
+	endGame()
+}
 
-	fmt.Printf("Final score: %d / %d\n", g.score, len(qa))
+func endGame() {
+	fmt.Printf("\nFinal score: %d / %d\n", score, numOfQ)
+	os.Exit(0)
 }
