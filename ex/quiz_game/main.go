@@ -64,6 +64,7 @@ func getQuestions(path string, shuffle bool) [][]string {
 
 	if err != nil {
 		fmt.Printf("Something went wrong with opening this file: %s", path)
+		os.Exit(1)
 	}
 
 	if shuffle {
