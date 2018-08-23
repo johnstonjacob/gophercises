@@ -12,14 +12,19 @@ import (
 func main() {
 	S, err := parsejson.ParseJSON("gopher.json")
 
+	m := storyhttp.MapPathsToArcs(S)
+
+	_ = m
+
 	if err != nil {
 		panic(err)
 	}
 
-	template, err := storyhttp.Storyhttp(S)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		template.Execute(w, S["intro"])
-	})
+	tmpl, err := storyhttp.StoryTemplate(S)
+
+	_ = tmpl
+
+	storyhttp.StoryHandler(tmpl, S, m)
 
 	http.ListenAndServe(":8080", nil)
 

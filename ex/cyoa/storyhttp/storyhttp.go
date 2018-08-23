@@ -3,23 +3,13 @@ package storyhttp
 import (
 	"fmt"
 	"html/template"
+	"net/http"
 
 	"github.com/johnstonjacob/gophercises/ex/cyoa/parsejson"
 )
 
-// Storyhttp is the http handler and html server
-func Storyhttp(s parsejson.Story) (*template.Template, error) {
-
-	t, err := storyTemplate()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return t, nil
-}
-
-func storyTemplate() (*template.Template, error) {
+// StoryTemplate is the http handler and html server
+func StoryTemplate(s parsejson.Story) (*template.Template, error) {
 	t, err := template.ParseFiles("template.html")
 
 	if err != nil {
@@ -31,3 +21,27 @@ func storyTemplate() (*template.Template, error) {
 
 	return tmpl, nil
 }
+
+// StoryHandler comment
+func StoryHandler(tmpl *template.Template, S parsejson.Story, m pathsToArcs) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		if m[path] == "" {
+			tmpl.Execute(w, S[m["/intro"]])
+		} else {
+			tmpl.Execute(w, S[m[path]])
+		}
+	})
+}
+
+// MapPathsToArcs comment
+func MapPathsToArcs(s parsejson.Story) pathsToArcs {
+	m := make(pathsToArcs)
+	for k := range s {
+		m["/"+k] = k
+	}
+
+	return m
+}
+
+type pathsToArcs map[string]string
