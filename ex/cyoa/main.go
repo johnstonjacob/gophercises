@@ -16,8 +16,11 @@ func main() {
 		panic(err)
 	}
 
-	storyHandler, err := storyhttp.Storyhttp(&S)
+	template, err := storyhttp.Storyhttp(S)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		template.Execute(w, S["intro"])
+	})
 
-	http.ListenAndServe(":8080", storyHandler)
+	http.ListenAndServe(":8080", nil)
 
 }
