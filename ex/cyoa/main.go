@@ -14,15 +14,11 @@ func main() {
 
 	m := storyhttp.MapPathsToArcs(S)
 
-	_ = m
-
 	if err != nil {
 		panic(err)
 	}
 
 	tmpl, err := storyhttp.StoryTemplate(S)
-
-	_ = tmpl
 
 	storyhttp.StoryHandler(tmpl, S, m)
 
