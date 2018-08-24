@@ -25,11 +25,11 @@ func StoryTemplate(s parsejson.Story) (*template.Template, error) {
 // StoryHandler comment
 func StoryHandler(tmpl *template.Template, S parsejson.Story, m pathsToArcs) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
-		if m[path] == "" {
-			tmpl.Execute(w, S[m["/intro"]])
+		path, ok := m[r.URL.Path]
+		if ok {
+			tmpl.Execute(w, S[path])
 		} else {
-			tmpl.Execute(w, S[m[path]])
+			tmpl.Execute(w, S["intro"])
 		}
 	})
 }
@@ -40,7 +40,6 @@ func MapPathsToArcs(s parsejson.Story) pathsToArcs {
 	for k := range s {
 		m["/"+k] = k
 	}
-
 	return m
 }
 
