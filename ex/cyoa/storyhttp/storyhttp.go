@@ -23,13 +23,12 @@ func StoryTemplate(s parsejson.Story) (*template.Template, error) {
 }
 
 // StoryHandler comment
-func StoryHandler(tmpl *template.Template, S parsejson.Story, m pathsToArcs) {
+func StoryHandler(t *template.Template, S parsejson.Story, m pathsToArcs) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		path, ok := m[r.URL.Path]
-		if ok {
-			tmpl.Execute(w, S[path])
+		if path, ok := m[r.URL.Path]; ok {
+			t.Execute(w, S[path])
 		} else {
-			tmpl.Execute(w, S["intro"])
+			t.Execute(w, S["intro"])
 		}
 	})
 }
