@@ -25,4 +25,6 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(doCmd)
+	rootCmd.AddCommand(listCmd)
 }
