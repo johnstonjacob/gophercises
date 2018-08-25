@@ -11,7 +11,9 @@ var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Adds a Todo list item",
 	Run: func(cmd *cobra.Command, args []string) {
-		ink.Success(strings.Join(args, " "))
-		ink.Success("Todo list item added")
+		s := strings.Join(args, " ")
+		ink.Success("Todo list item added: ")
+		ink.Success(s)
+		Db.Create(&Todo{Task: s, Complete: false})
 	},
 }
